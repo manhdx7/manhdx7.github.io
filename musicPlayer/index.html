@@ -66,51 +66,183 @@
   </div>
 
   <!-- Playlist -->
-  <div class="playlist">
-    <div class="song">
-      <div
-        class="thumb"
-        style="
-          background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg');
-        "
-      ></div>
-      <div class="body">
-        <h3 class="title">Music name</h3>
-        <p class="author">Singer</p>
-      </div>
-      <div class="option">
-        <i class="fas fa-ellipsis-h"></i>
-      </div>
-    </div>
-    <div class="song">
-      <div
-        class="thumb"
-        style="
-          background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg');
-        "
-      ></div>
-      <div class="body">
-        <h3 class="title">Music name</h3>
-        <p class="author">Singer</p>
-      </div>
-      <div class="option">
-        <i class="fas fa-ellipsis-h"></i>
-      </div>
-    </div>
-    <div class="song">
-      <div
-        class="thumb"
-        style="
-          background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg');
-        "
-      ></div>
-      <div class="body">
-        <h3 class="title">Music name</h3>
-        <p class="author">Singer</p>
-      </div>
-      <div class="option">
-        <i class="fas fa-ellipsis-h"></i>
-      </div>
-    </div>
-  </div>
+  <div class="playlist"></div>
 </div>
+<script>
+  const $ = document.querySelector.bind(document);
+  const $$ = document.querySelectorAll.bind(document);
+
+  const cd = $(".cd");
+  const heading = $("header h2");
+  const cdThumb = $(".cd-thumb");
+  const audio = $("#audio");
+  const playBtn = $(".btn-toggle-play");
+  const player = $(".player");
+  const progress = $("#progress");
+
+  const app = {
+    currentIndex: 2,
+    isPlaying: false,
+    songs: [
+      {
+        name: "-237",
+        singer: "Hieuthuhai",
+        path: "/assets/mp3/music1.mp3",
+        image: "/assets/imgs/img1.jpg",
+      },
+      {
+        name: "Chang the tim duoc em",
+        singer: "freak D",
+        path: "/assets/mp3/music2.mp3",
+        image: "/assets/imgs/img2.jpg",
+      },
+      {
+        name: "Anh sao va bau troi",
+        singer: "TRIXCA",
+        path: "/assets/mp3/music3.mp3",
+        image: "/assets/imgs/img3.jpg",
+      },
+      {
+        name: "nghe nhu tinh yeu",
+        singer: "Hieuthuhai",
+        path: "/assets/mp3/music4.mp3",
+        image: "/assets/imgs/img4.jpg",
+      },
+      {
+        name: "hong ve tinh yeu",
+        singer: "khoi vu",
+        path: "/assets/mp3/music5.mp3",
+        image: "/assets/imgs/img5.jpg",
+      },
+      {
+        name: "-237",
+        singer: "Hieuthuhai",
+        path: "/assets/mp3/music1.mp3",
+        image: "/assets/imgs/img1.jpg",
+      },
+      {
+        name: "Chang the tim duoc em",
+        singer: "freak D",
+        path: "/assets/mp3/music2.mp3",
+        image: "/assets/imgs/img2.jpg",
+      },
+      {
+        name: "Anh sao va bau troi",
+        singer: "TRIXCA",
+        path: "/assets/mp3/music3.mp3",
+        image: "/assets/imgs/img3.jpg",
+      },
+      {
+        name: "nghe nhu tinh yeu",
+        singer: "Hieuthuhai",
+        path: "/assets/mp3/music4.mp3",
+        image: "/assets/imgs/img4.jpg",
+      },
+      {
+        name: "hong ve tinh yeu",
+        singer: "khoi vu",
+        path: "/assets/mp3/music5.mp3",
+        image: "/assets/imgs/img5.jpg",
+      },
+    ],
+    render: function () {
+      const html = this.songs.map((song) => {
+        return `
+        <div class="song">
+          <div
+            class="thumb"
+            style="background-image: url('${song.image}')"
+          ></div>
+          <div class="body">
+            <h3 class="title">${song.name}</h3>
+            <p class="author">${song.singer}</p>
+          </div>
+          <div class="option">
+            <i class="fas fa-ellipsis-h"></i>
+          </div>
+        </div>`;
+      });
+      $(".playlist").innerHTML = html.join("");
+    },
+    defineProperties: function () {
+      Object.defineProperty(this, "currentSong", {
+        get: () => {
+          return this.songs[this.currentIndex];
+        },
+      });
+    },
+    handleEvents: function () {
+      const _this = this;
+      const cdWidth = cd.offsetWidth;
+
+      //xu ly click nut play
+      playBtn.onclick = () => {
+        if (_this.isPlaying) {
+          audio.pause();
+        } else {
+          audio.play();
+        }
+      };
+
+      // xu ly quay/dung cd
+      const cdThumbAnimation = cdThumb.animate(
+        [{ transform: "rotate(360deg)" }],
+        {
+          duration: 10000,
+          iterations: Infinity,
+        }
+      );
+      cdThumbAnimation.pause();
+
+      //  khi song được play
+      audio.onplay = () => {
+        player.classList.add("playing");
+        _this.isPlaying = true;
+        cdThumbAnimation.play();
+      };
+
+      // khi đang pause song
+      audio.onpause = () => {
+        player.classList.remove("playing");
+        _this.isPlaying = false;
+        cdThumbAnimation.pause();
+      };
+
+      // khi bai hat dang chay
+      audio.ontimeupdate = () => {
+        if (audio.duration) {
+          const progressPercent = Math.floor(
+            (audio.currentTime / audio.duration) * 100
+          );
+          progress.value = progressPercent;
+        }
+      };
+
+      // xu ly khi tua
+      progress.onchange = (e) => {
+        const seekTime = (audio.duration / 100) * e.target.value;
+        audio.currentTime = seekTime;
+      };
+
+      //xu ly phong to thu nho cd
+      document.onscroll = () => {
+        const scrollY = window.scrollY;
+        const newCdWidth = cdWidth - scrollY;
+        cd.style.width = newCdWidth > 0 ? newCdWidth + "px" : 0;
+        cd.style.opacity = newCdWidth / cdWidth;
+      };
+    },
+    loadCurrentSong: function () {
+      heading.textContent = this.currentSong.name;
+      cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
+      audio.src = this.currentSong.path;
+    },
+    start: function () {
+      this.defineProperties();
+      this.handleEvents();
+      this.loadCurrentSong();
+      this.render();
+    },
+  };
+  app.start();
+</script>
